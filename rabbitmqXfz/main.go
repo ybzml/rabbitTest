@@ -4,34 +4,46 @@ import (
 	"fmt"
 	"github.com/streadway/amqp"
 	"log"
+	"sync"
 )
+
+var wg sync.WaitGroup
 
 func main() {
 	connction, err1 := amqp.Dial("amqp://admin:123@39.107.239.138:5672/")
-	//defer connction.Close()
+	defer connction.Close()
 	if err1 != nil {
 		log.Fatal("连接  failed! %v\n", err1)
 	}
 	channel, _ := connction.Channel()
-	//defer channel.Close()
-
+	defer channel.Close()
 	channel.ExchangeDeclare(
-		"derectEx",
-		"direct",
+		"topicEx",
+		"topic",
 		false,
 		false,
 		false,
 		false,
 		nil)
-
+	wg.Add(2)
+	go func() {
+		for msg1 := range createAndCusQue(channel, "topicwwww.#") {
+			fmt.Printf("ms1:%s\n", msg1.Body)
+		}
+	}()
+	go func() {
+		for msg2 := range createAndCusQue(channel, "topickkkk.#") {
+			fmt.Printf("ms2:%s\n", msg2.Body)
+		}
+	}()
+	wg.Wait()
+}
+func createAndCusQue(channel *amqp.Channel, routing_key string) <-chan amqp.Delivery {
 	queue, err := channel.QueueDeclare("", false, false, false, false, nil)
-
-	channel.QueueBind(queue.Name, "direct_key", "derectEx", false, nil)
-
+	channel.QueueBind(queue.Name, routing_key, "topicEx", false, nil)
 	if err != nil {
 		log.Fatal("queue  failed! %v\n", err)
 	}
 	consume, _ := channel.Consume(queue.Name, "", false, false, false, false, nil)
-	msg := <-consume
-	fmt.Printf("received msg:%s\n", msg.Body)
+	return consume
 }
