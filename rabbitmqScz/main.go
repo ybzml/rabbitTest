@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	connction, _ := amqp.Dial("amqp://admin:123@39.107.239.138:5672/")
+	connction, _ := amqp.Dial("amqp://admin:admin@192.168.192.129:5672/")
 	channel, _ := connction.Channel()
 	channel.ExchangeDeclare(
 		"topicEx",

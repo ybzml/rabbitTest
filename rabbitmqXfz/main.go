@@ -10,7 +10,7 @@ import (
 var wg sync.WaitGroup
 
 func main() {
-	connction, err1 := amqp.Dial("amqp://admin:123@39.107.239.138:5672/")
+	connction, err1 := amqp.Dial("amqp://admin:admin@192.168.192.129:5672/")
 	defer connction.Close()
 	if err1 != nil {
 		log.Fatal("连接  failed! %v\n", err1)
@@ -29,11 +29,13 @@ func main() {
 	go func() {
 		for msg1 := range createAndCusQue(channel, "topicwwww.#") {
 			fmt.Printf("ms1:%s\n", msg1.Body)
+			msg1.Ack(false)
 		}
 	}()
 	go func() {
 		for msg2 := range createAndCusQue(channel, "topickkkk.#") {
 			fmt.Printf("ms2:%s\n", msg2.Body)
+			msg2.Ack(false)
 		}
 	}()
 	wg.Wait()
