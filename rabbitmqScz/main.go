@@ -8,21 +8,31 @@ import (
 func main() {
 	connction, _ := amqp.Dial("amqp://admin:123@39.107.239.138:5672/")
 	channel, _ := connction.Channel()
-	msg := "hello world"
 	channel.ExchangeDeclare(
-		"derectEx",
-		"direct",
+		"topicEx",
+		"topic",
 		false,
 		false,
 		false,
 		false,
 		nil)
 
-	err := channel.Publish("derectEx", "direct_key", false, false, amqp.Publishing{
-		Body: []byte(msg),
+	err1 := channel.Publish("topicEx", "topicwwww.ag", false, false, amqp.Publishing{
+		Body: []byte("wsk1"),
 	})
-	if err != nil {
-		log.Fatal("send msg failed! %v\n", err)
-
+	if err1 != nil {
+		log.Fatal("send msg failed! %v\n", err1)
+	}
+	err2 := channel.Publish("topicEx", "topicwwww.ns", false, false, amqp.Publishing{
+		Body: []byte("nsk2"),
+	})
+	if err2 != nil {
+		log.Fatal("send msg failed! %v\n", err1)
+	}
+	err3 := channel.Publish("topicEx", "topickkkk.ns", false, false, amqp.Publishing{
+		Body: []byte("kkkkkkkkkkkk"),
+	})
+	if err2 != nil {
+		log.Fatal("send msg failed! %v\n", err3)
 	}
 }
