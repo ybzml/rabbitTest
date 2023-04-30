@@ -1,4 +1,4 @@
-module awesomeProject3
+module rabbitTest
 
 go 1.20
 
